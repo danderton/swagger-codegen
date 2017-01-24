@@ -2,11 +2,9 @@
 <!--
 {{#appName}}
 {{{appName}}}
-
 {{/appName}}
 {{#appDescription}}
 {{{appDescription}}}
-
 {{/appDescription}}
 {{#version}}OpenAPI spec version: {{version}}{{/version}}
 {{#infoEmail}}Contact: {{{infoEmail}}}{{/infoEmail}}
@@ -40,6 +38,18 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  
+  <PropertyGroup>
+  
+    <SignAssembly>true</SignAssembly>
+    
+  </PropertyGroup>
+  
+  <PropertyGroup>
+  
+    <AssemblyOriginatorKeyFile>..\..\..\BuildProcessRequirements\StrongKey.snk</AssemblyOriginatorKeyFile>
+    
+  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
@@ -59,16 +69,16 @@
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml" />
     <Reference Include="Newtonsoft.Json">
-      <HintPath Condition="Exists('$(SolutionDir)\packages')">$(SolutionDir)\packages\Newtonsoft.Json.8.0.3\lib\{{targetFrameworkNuget}}\Newtonsoft.Json.dll</HintPath>
-      <HintPath Condition="Exists('..\packages')">..\packages\Newtonsoft.Json.8.0.3\lib\{{targetFrameworkNuget}}\Newtonsoft.Json.dll</HintPath>
-      <HintPath Condition="Exists('..\..\packages')">..\..\packages\Newtonsoft.Json.8.0.3\lib\{{targetFrameworkNuget}}\Newtonsoft.Json.dll</HintPath>
-      <HintPath Condition="Exists('{{binRelativePath}}')">{{binRelativePath}}\Newtonsoft.Json.8.0.3\lib\{{targetFrameworkNuget}}\Newtonsoft.Json.dll</HintPath>
+      <HintPath Condition="Exists('$(SolutionDir)\packages')">$(SolutionDir)\packages\Newtonsoft.Json.9.0.1\lib\{{targetFrameworkNuget}}\Newtonsoft.Json.dll</HintPath>
+      <HintPath Condition="Exists('..\packages')">..\packages\Newtonsoft.Json.9.0.1\lib\{{targetFrameworkNuget}}\Newtonsoft.Json.dll</HintPath>
+      <HintPath Condition="Exists('..\..\packages')">..\..\packages\Newtonsoft.Json.9.0.1\lib\{{targetFrameworkNuget}}\Newtonsoft.Json.dll</HintPath>
+      <HintPath Condition="Exists('{{binRelativePath}}')">{{binRelativePath}}\Newtonsoft.Json.9.0.1\lib\{{targetFrameworkNuget}}\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="RestSharp">
-        <HintPath Condition="Exists('$(SolutionDir)\packages')">$(SolutionDir)\packages\RestSharp.105.1.0\lib\{{targetFrameworkNuget}}\RestSharp.dll</HintPath>
-        <HintPath Condition="Exists('..\packages')">..\packages\RestSharp.105.1.0\lib\{{targetFrameworkNuget}}\RestSharp.dll</HintPath>
-        <HintPath Condition="Exists('..\..\packages')">..\..\packages\RestSharp.105.1.0\lib\{{targetFrameworkNuget}}\RestSharp.dll</HintPath>
-      <HintPath Condition="Exists('{{binRelativePath}}')">{{binRelativePath}}\RestSharp.105.1.0\lib\{{targetFrameworkNuget}}\RestSharp.dll</HintPath>
+    <Reference Include="RestSharpSigned">
+        <HintPath Condition="Exists('$(SolutionDir)\packages')">$(SolutionDir)\packages\RestSharpSigned.105.2.3\lib\{{targetFrameworkNuget}}\RestSharp.dll</HintPath>
+        <HintPath Condition="Exists('..\packages')">..\packages\RestSharpSigned.105.2.3\lib\{{targetFrameworkNuget}}\RestSharp.dll</HintPath>
+        <HintPath Condition="Exists('..\..\packages')">..\..\packages\RestSharpSigned.105.2.3\lib\{{targetFrameworkNuget}}\RestSharp.dll</HintPath>
+      <HintPath Condition="Exists('{{binRelativePath}}')">{{binRelativePath}}\RestSharpSigned.105.2.3\lib\{{targetFrameworkNuget}}\RestSharp.dll</HintPath>
     </Reference>
     {{#generatePropertyChanged}}<Reference Include="PropertyChanged">
       <HintPath>..\..\packages\PropertyChanged.Fody.1.51.3\Lib\portable-net4+sl4+wp8+win8+wpa81+MonoAndroid16+MonoTouch40\PropertyChanged.dll</HintPath>
@@ -79,10 +89,10 @@
   </ItemGroup>
   <ItemGroup>
       <None Include="packages.config" />
+      <None Include="..\..\..\BuildProcessRequirements\StrongKey.snk" />
       {{#generatePropertyChanged}}<None Include="FodyWeavers.xml" />{{/generatePropertyChanged}}
   </ItemGroup>
   <Import Project="$(MsBuildToolsPath)\Microsoft.CSharp.targets" />{{#generatePropertyChanged}}
   <Import Project="..\..\packages\Fody.1.29.2\build\portable-net+sl+win+wpa+wp\Fody.targets" Condition="Exists('..\..\packages\Fody.1.29.2\build\portable-net+sl+win+wpa+wp\Fody.targets')" />
   {{/generatePropertyChanged}}
 </Project>
-
