@@ -20,6 +20,7 @@ import io.swagger.models.properties.ObjectProperty;
 import io.swagger.models.properties.Property;
 
 public class TypeScriptAngular2ClientCodegen extends AbstractTypeScriptClientCodegen {
+    @SuppressWarnings("SimpleDateFormat") // suppress this for now
     private static final SimpleDateFormat SNAPSHOT_SUFFIX_FORMAT = new SimpleDateFormat("yyyyMMddHHmm");
 
     public static final String NPM_NAME = "npmName";
