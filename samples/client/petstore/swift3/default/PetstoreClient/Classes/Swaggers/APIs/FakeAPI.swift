@@ -42,6 +42,7 @@ open class FakeAPI: APIBase {
 
         let url = NSURLComponents(string: URLString)
 
+
         let requestBuilder: RequestBuilder<Client>.Type = PetstoreClientAPI.requestBuilderFactory.getBuilder()
 
         return requestBuilder.init(method: "PATCH", URLString: (url?.string ?? URLString), parameters: parameters, isBody: true)
@@ -123,6 +124,7 @@ open class FakeAPI: APIBase {
 
         let url = NSURLComponents(string: URLString)
 
+
         let requestBuilder: RequestBuilder<Void>.Type = PetstoreClientAPI.requestBuilderFactory.getBuilder()
 
         return requestBuilder.init(method: "POST", URLString: (url?.string ?? URLString), parameters: parameters, isBody: false)
@@ -146,6 +148,23 @@ open class FakeAPI: APIBase {
     }
 
     /**
+     * enum for parameter enumHeaderStringArray
+     */
+    public enum EnumHeaderStringArray_testEnumParameters: String { 
+        case greaterThan = ">"
+        case dollar = "$"
+    }
+
+    /**
+     * enum for parameter enumHeaderString
+     */
+    public enum EnumHeaderString_testEnumParameters: String { 
+        case abc = "_abc"
+        case efg = "-efg"
+        case xyz = "(xyz)"
+    }
+
+    /**
      * enum for parameter enumQueryStringArray
      */
     public enum EnumQueryStringArray_testEnumParameters: String { 
@@ -163,18 +182,36 @@ open class FakeAPI: APIBase {
     }
 
     /**
+     * enum for parameter enumQueryInteger
+     */
+    public enum EnumQueryInteger_testEnumParameters: Int32 { 
+        case _1 = 1
+        case numberminus2 = -2
+    }
+
+    /**
+     * enum for parameter enumQueryDouble
+     */
+    public enum EnumQueryDouble_testEnumParameters: Double { 
+        case _11 = 1.1
+        case numberminus12 = -1.2
+    }
+
+    /**
      To test enum parameters
      
      - parameter enumFormStringArray: (form) Form parameter enum test (string array) (optional)
      - parameter enumFormString: (form) Form parameter enum test (string) (optional, default to -efg)
+     - parameter enumHeaderStringArray: (header) Header parameter enum test (string array) (optional)
+     - parameter enumHeaderString: (header) Header parameter enum test (string) (optional, default to -efg)
      - parameter enumQueryStringArray: (query) Query parameter enum test (string array) (optional)
      - parameter enumQueryString: (query) Query parameter enum test (string) (optional, default to -efg)
      - parameter enumQueryInteger: (query) Query parameter enum test (double) (optional)
      - parameter enumQueryDouble: (form) Query parameter enum test (double) (optional)
      - parameter completion: completion handler to receive the data and the error objects
      */
-    open class func testEnumParameters(enumFormStringArray: [String]? = nil, enumFormString: EnumFormString_testEnumParameters? = nil, enumQueryStringArray: [String]? = nil, enumQueryString: EnumQueryString_testEnumParameters? = nil, enumQueryInteger: Int32? = nil, enumQueryDouble: Double? = nil, completion: @escaping ((_ error: Error?) -> Void)) {
-        testEnumParametersWithRequestBuilder(enumFormStringArray: enumFormStringArray, enumFormString: enumFormString, enumQueryStringArray: enumQueryStringArray, enumQueryString: enumQueryString, enumQueryInteger: enumQueryInteger, enumQueryDouble: enumQueryDouble).execute { (response, error) -> Void in
+    open class func testEnumParameters(enumFormStringArray: [String]? = nil, enumFormString: EnumFormString_testEnumParameters? = nil, enumHeaderStringArray: [String]? = nil, enumHeaderString: EnumHeaderString_testEnumParameters? = nil, enumQueryStringArray: [String]? = nil, enumQueryString: EnumQueryString_testEnumParameters? = nil, enumQueryInteger: EnumQueryInteger_testEnumParameters? = nil, enumQueryDouble: EnumQueryDouble_testEnumParameters? = nil, completion: @escaping ((_ error: Error?) -> Void)) {
+        testEnumParametersWithRequestBuilder(enumFormStringArray: enumFormStringArray, enumFormString: enumFormString, enumHeaderStringArray: enumHeaderStringArray, enumHeaderString: enumHeaderString, enumQueryStringArray: enumQueryStringArray, enumQueryString: enumQueryString, enumQueryInteger: enumQueryInteger, enumQueryDouble: enumQueryDouble).execute { (response, error) -> Void in
             completion(error);
         }
     }
@@ -187,6 +224,8 @@ open class FakeAPI: APIBase {
      
      - parameter enumFormStringArray: (form) Form parameter enum test (string array) (optional)
      - parameter enumFormString: (form) Form parameter enum test (string) (optional, default to -efg)
+     - parameter enumHeaderStringArray: (header) Header parameter enum test (string array) (optional)
+     - parameter enumHeaderString: (header) Header parameter enum test (string) (optional, default to -efg)
      - parameter enumQueryStringArray: (query) Query parameter enum test (string array) (optional)
      - parameter enumQueryString: (query) Query parameter enum test (string) (optional, default to -efg)
      - parameter enumQueryInteger: (query) Query parameter enum test (double) (optional)
@@ -194,13 +233,13 @@ open class FakeAPI: APIBase {
 
      - returns: RequestBuilder<Void> 
      */
-    open class func testEnumParametersWithRequestBuilder(enumFormStringArray: [String]? = nil, enumFormString: EnumFormString_testEnumParameters? = nil, enumQueryStringArray: [String]? = nil, enumQueryString: EnumQueryString_testEnumParameters? = nil, enumQueryInteger: Int32? = nil, enumQueryDouble: Double? = nil) -> RequestBuilder<Void> {
+    open class func testEnumParametersWithRequestBuilder(enumFormStringArray: [String]? = nil, enumFormString: EnumFormString_testEnumParameters? = nil, enumHeaderStringArray: [String]? = nil, enumHeaderString: EnumHeaderString_testEnumParameters? = nil, enumQueryStringArray: [String]? = nil, enumQueryString: EnumQueryString_testEnumParameters? = nil, enumQueryInteger: EnumQueryInteger_testEnumParameters? = nil, enumQueryDouble: EnumQueryDouble_testEnumParameters? = nil) -> RequestBuilder<Void> {
         let path = "/fake"
         let URLString = PetstoreClientAPI.basePath + path
         let formParams: [String:Any?] = [
             "enum_form_string_array": enumFormStringArray,
             "enum_form_string": enumFormString?.rawValue,
-            "enum_query_double": enumQueryDouble
+            "enum_query_double": enumQueryDouble?.rawValue
         ]
 
         let nonNullParameters = APIHelper.rejectNil(formParams)
@@ -208,14 +247,20 @@ open class FakeAPI: APIBase {
 
         let url = NSURLComponents(string: URLString)
         url?.queryItems = APIHelper.mapValuesToQueryItems(values:[
-                "enumQueryStringArray": enumQueryStringArray, 
-                "enumQueryString": enumQueryString, 
-                "enumQueryInteger": enumQueryInteger
+            "enum_query_string_array": enumQueryStringArray, 
+            "enum_query_string": enumQueryString?.rawValue, 
+            "enum_query_integer": enumQueryInteger?.encodeToJSON()?.rawValue
         ])
+        
+        let nillableHeaders: [String: Any?] = [
+            "enum_header_string_array": enumHeaderStringArray,
+            "enum_header_string": enumHeaderString?.rawValue
+        ]
+        let headerParameters = APIHelper.rejectNilHeaders(nillableHeaders)
 
         let requestBuilder: RequestBuilder<Void>.Type = PetstoreClientAPI.requestBuilderFactory.getBuilder()
 
-        return requestBuilder.init(method: "GET", URLString: (url?.string ?? URLString), parameters: parameters, isBody: false)
+        return requestBuilder.init(method: "GET", URLString: (url?.string ?? URLString), parameters: parameters, isBody: false, headers: headerParameters)
     }
 
 }

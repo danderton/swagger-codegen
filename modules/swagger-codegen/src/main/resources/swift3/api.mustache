@@ -88,7 +88,7 @@ open class {{classname}}: APIBase {
      {{#summary}}
      {{{summary}}}
      {{/summary}}
-     - {{httpMethod}} {{path}}{{#notes}}
+     - {{httpMethod}} {{{path}}}{{#notes}}
      - {{{notes}}}{{/notes}}{{#subresourceOperation}}
      - subresourceOperation: {{subresourceOperation}}{{/subresourceOperation}}{{#defaultResponse}}
      - defaultResponse: {{defaultResponse}}{{/defaultResponse}}{{#authMethods}}
@@ -104,8 +104,8 @@ open class {{classname}}: APIBase {
      - returns: RequestBuilder<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}> {{description}}
      */
     open class func {{operationId}}WithRequestBuilder({{#allParams}}{{paramName}}: {{#isEnum}}{{#isContainer}}{{{dataType}}}{{/isContainer}}{{^isContainer}}{{{datatypeWithEnum}}}_{{operationId}}{{/isContainer}}{{/isEnum}}{{^isEnum}}{{{dataType}}}{{/isEnum}}{{^required}}? = nil{{/required}}{{#hasMore}}, {{/hasMore}}{{/allParams}}) -> RequestBuilder<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}> {
-        {{^pathParams}}let{{/pathParams}}{{#pathParams}}{{^secondaryParam}}var{{/secondaryParam}}{{/pathParams}} path = "{{path}}"{{#pathParams}}
-        path = path.replacingOccurrences(of: "{{=<% %>=}}{<%paramName%>}<%={{ }}=%>", with: "\({{paramName}}{{#isEnum}}{{#isContainer}}{{{dataType}}}{{/isContainer}}{{^isContainer}}.rawValue{{/isContainer}}{{/isEnum}})", options: .literal, range: nil){{/pathParams}}
+        {{^pathParams}}let{{/pathParams}}{{#pathParams}}{{^secondaryParam}}var{{/secondaryParam}}{{/pathParams}} path = "{{{path}}}"{{#pathParams}}
+        path = path.replacingOccurrences(of: "{{=<% %>=}}{<%baseName%>}<%={{ }}=%>", with: "\({{paramName}}{{#isEnum}}{{#isContainer}}{{{dataType}}}{{/isContainer}}{{^isContainer}}.rawValue{{/isContainer}}{{/isEnum}})", options: .literal, range: nil){{/pathParams}}
         let URLString = {{projectName}}API.basePath + path
         {{#bodyParam}}
         let parameters = {{paramName}}{{^required}}?{{/required}}.encodeToJSON() as? [String:AnyObject]
@@ -129,15 +129,19 @@ open class {{classname}}: APIBase {
         let url = NSURLComponents(string: URLString)
         {{#hasQueryParams}}
         url?.queryItems = APIHelper.mapValuesToQueryItems(values:[
-        {{#queryParams}}
-                "{{paramName}}": {{paramName}}{{#hasMore}}, {{/hasMore}}
-        {{/queryParams}}
+            {{#queryParams}}
+            {{> _param}}{{#hasMore}}, {{/hasMore}}
+            {{/queryParams}}
         ])
-        {{/hasQueryParams}}
+        {{/hasQueryParams}}{{#headerParams}}{{^secondaryParam}}
+        let nillableHeaders: [String: Any?] = [{{/secondaryParam}}
+            {{> _param}}{{#hasMore}},{{/hasMore}}{{^hasMore}}
+        ]
+        let headerParameters = APIHelper.rejectNilHeaders(nillableHeaders){{/hasMore}}{{/headerParams}}
 
         let requestBuilder: RequestBuilder<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}>.Type = {{projectName}}API.requestBuilderFactory.getBuilder()
 
-        return requestBuilder.init(method: "{{httpMethod}}", URLString: (url?.string ?? URLString), parameters: parameters, isBody: {{hasBodyParam}})
+        return requestBuilder.init(method: "{{httpMethod}}", URLString: (url?.string ?? URLString), parameters: parameters, isBody: {{hasBodyParam}}{{#headerParams}}{{^secondaryParam}}, headers: headerParameters{{/secondaryParam}}{{/headerParams}})
     }
 
 {{/operation}}

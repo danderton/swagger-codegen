@@ -110,7 +110,8 @@ export class StoreApi {
      * @param orderId ID of the order that needs to be deleted
      */
     public deleteOrderWithHttpInfo(orderId: string, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + `/store/order/${orderId}`;
+        const path = this.basePath + '/store/order/${orderId}'
+                    .replace('${' + 'orderId' + '}', String(orderId));
 
         let queryParameters = new URLSearchParams();
         let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
@@ -127,13 +128,13 @@ export class StoreApi {
             'application/json', 
             'application/xml'
         ];
-        
+
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
             search: queryParameters
         });
-        
+
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -141,13 +142,13 @@ export class StoreApi {
 
         return this.http.request(path, requestOptions);
     }
-    
+
     /**
      * Returns pet inventories by status
      * Returns a map of status codes to quantities
      */
     public getInventoryWithHttpInfo(extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + `/store/inventory`;
+        const path = this.basePath + '/store/inventory';
 
         let queryParameters = new URLSearchParams();
         let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
@@ -160,7 +161,7 @@ export class StoreApi {
             'application/json', 
             'application/xml'
         ];
-        
+
         // authentication (api_key) required
         if (this.configuration.apiKey) {
             headers.set('api_key', this.configuration.apiKey);
@@ -171,7 +172,7 @@ export class StoreApi {
             headers: headers,
             search: queryParameters
         });
-        
+
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -179,14 +180,15 @@ export class StoreApi {
 
         return this.http.request(path, requestOptions);
     }
-    
+
     /**
      * Find purchase order by ID
      * For valid response try integer IDs with value &lt;&#x3D; 5 or &gt; 10. Other values will generated exceptions
      * @param orderId ID of pet that needs to be fetched
      */
     public getOrderByIdWithHttpInfo(orderId: string, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + `/store/order/${orderId}`;
+        const path = this.basePath + '/store/order/${orderId}'
+                    .replace('${' + 'orderId' + '}', String(orderId));
 
         let queryParameters = new URLSearchParams();
         let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
@@ -203,13 +205,13 @@ export class StoreApi {
             'application/json', 
             'application/xml'
         ];
-        
+
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
             search: queryParameters
         });
-        
+
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -217,14 +219,14 @@ export class StoreApi {
 
         return this.http.request(path, requestOptions);
     }
-    
+
     /**
      * Place an order for a pet
      * 
      * @param body order placed for purchasing the pet
      */
     public placeOrderWithHttpInfo(body?: models.Order, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + `/store/order`;
+        const path = this.basePath + '/store/order';
 
         let queryParameters = new URLSearchParams();
         let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
@@ -237,7 +239,7 @@ export class StoreApi {
             'application/json', 
             'application/xml'
         ];
-        
+
         headers.set('Content-Type', 'application/json');
 
         let requestOptions: RequestOptionsArgs = new RequestOptions({
@@ -246,7 +248,7 @@ export class StoreApi {
             body: body == null ? '' : JSON.stringify(body), // https://github.com/angular/angular/issues/10612
             search: queryParameters
         });
-        
+
         // https://github.com/swagger-api/swagger-codegen/issues/4037
         if (extraHttpRequestParams) {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
@@ -254,5 +256,5 @@ export class StoreApi {
 
         return this.http.request(path, requestOptions);
     }
-    
+
 }
