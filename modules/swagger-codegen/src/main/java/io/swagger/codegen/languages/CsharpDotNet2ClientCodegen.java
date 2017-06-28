@@ -25,7 +25,6 @@ public class CsharpDotNet2ClientCodegen extends DefaultCodegen implements Codege
     protected String sourceFolder = "src" + File.separator + "main" + File.separator + "CsharpDotNet2";
     protected String apiDocPath = "docs/"; 
     protected String modelDocPath = "docs/";
-    private HashSet<String> nullableTypes = new HashSet<String>();
 
 
     public CsharpDotNet2ClientCodegen() {
@@ -58,22 +57,22 @@ public class CsharpDotNet2ClientCodegen extends DefaultCodegen implements Codege
                 Arrays.asList(
                         "String",
                         "string",
-                        "bool",
- +                      "double",
- +                      "int",
- +                      "long",
- +                      "float",
+                        "bool?",
+                        "double?",
+                        "int?",
+                        "long?",
+                        "float?",
                         "byte[]",
                         "List",
                         "Dictionary",
-                        "DateTime",
+                        "DateTime?",
                         "String",
                         "Boolean",
                         "Double",
                         "Integer",
                         "Long",
                         "Float",
-                        "Guid",
+                        "Guid?",
                         "System.IO.Stream", // not really a primitive, we include it to avoid model import
                         "Object")
         );
@@ -82,31 +81,20 @@ public class CsharpDotNet2ClientCodegen extends DefaultCodegen implements Codege
 
         typeMapping = new HashMap<String, String>();
         typeMapping.put("string", "string");
-        typeMapping.put("boolean", "bool");
-        typeMapping.put("integer", "int");
-        typeMapping.put("float", "float");
-        typeMapping.put("long", "long");
-        typeMapping.put("double", "double");
-        typeMapping.put("number", "double");
-        typeMapping.put("datetime", "DateTime");
-        typeMapping.put("date", "DateTime");
+        typeMapping.put("boolean", "bool?");
+        typeMapping.put("integer", "int?");
+        typeMapping.put("float", "float?");
+        typeMapping.put("long", "long?");
+        typeMapping.put("double", "double?");
+        typeMapping.put("number", "double?");
+        typeMapping.put("datetime", "DateTime?");
+        typeMapping.put("date", "DateTime?");
         typeMapping.put("file", "System.IO.Stream");
         typeMapping.put("array", "List");
         typeMapping.put("list", "List");
         typeMapping.put("map", "Dictionary");
         typeMapping.put("object", "Object");
-        typeMapping.put("uuid", "Guid");
-        
-        nullableTypes.addAll(
- +                Arrays.asList(
- +                        "bool",
- +                        "int",
- +                        "float",
- +                        "long",
- +                        "double",
-                          "Guid",
- +                        "DateTime")
- +        );
+        typeMapping.put("uuid", "Guid?");
 
         cliOptions.clear();
         cliOptions.add(new CliOption(CodegenConstants.PACKAGE_NAME, "C# package name (convention: Camel.Case).")
@@ -283,25 +271,18 @@ public class CsharpDotNet2ClientCodegen extends DefaultCodegen implements Codege
 
     @Override
     public String getTypeDeclaration(Property p) {
-        String swaggerType = getSwaggerType(p);
         if (p instanceof ArrayProperty) {
             ArrayProperty ap = (ArrayProperty) p;
             Property inner = ap.getItems();
-            return swaggerType + "<" + getTypeDeclaration(inner) + ">";
+            return getSwaggerType(p) + "<" + getTypeDeclaration(inner) + ">";
         } else if (p instanceof MapProperty) {
             MapProperty mp = (MapProperty) p;
             Property inner = mp.getAdditionalProperties();
 
-            return swaggerType + "<String, " + getTypeDeclaration(inner) + ">";
- +        } else if (!p.getRequired() && nullableTypes.contains(swaggerType)) {
- +            return getNullableTypeFor(swaggerType);
+            return getSwaggerType(p) + "<String, " + getTypeDeclaration(inner) + ">";
         }
         return super.getTypeDeclaration(p);
     }
-    
-    private String getNullableTypeFor(String swaggerType) {
- +        return swaggerType + "?";
- +  }
 
     @Override
     public String getSwaggerType(Property p) {
