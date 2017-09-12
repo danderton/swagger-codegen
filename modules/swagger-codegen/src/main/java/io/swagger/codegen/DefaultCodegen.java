@@ -2707,12 +2707,11 @@ public class DefaultCodegen {
      */
     protected String getOrGenerateOperationId(Operation operation, String path, String httpMethod) {
         String operationId = operation.getOperationId();
-        String tmpPath = path;
-        tmpPath = tmpPath.replaceAll("\\{", "");
-        tmpPath = tmpPath.replaceAll("\\}", "");
-        String[] parts = (tmpPath + "/" + httpMethod).split("/");
-
         if (StringUtils.isBlank(operationId)) {
+            String tmpPath = path;
+            tmpPath = tmpPath.replaceAll("\\{", "");
+            tmpPath = tmpPath.replaceAll("\\}", "");
+            String[] parts = (tmpPath + "/" + httpMethod).split("/");
             StringBuilder builder = new StringBuilder();
             if ("/".equals(tmpPath)) {
                 // must be root tmpPath
@@ -2729,16 +2728,10 @@ public class DefaultCodegen {
                     builder.append(part);
                 }
             }
-            LOGGER.warn("Empty operationId found for path: " + httpMethod + " " + path + ". Renamed to auto-generated operationId: " + operationId);
-            return sanitizeName(builder.toString());
+            operationId = sanitizeName(builder.toString());
+            LOGGER.warn("Empty operationId found for path: " + httpMethod + " " + path + ". Renamed to auto-generated operationId: " + operationId);            
         }
-
-        //Gets the controller name from the URL, removes any non-alphanumeric characters
-        String controllerName = parts[3].replaceAll("[^A-Za-z0-9]", "");
-
-        //returns the method name, but replaces the first instance of the controller name.
-        //the (?i) is regex for case insensitivity.
-        return operationId.replaceFirst("(?i)"+controllerName, "");
+        return operationId;
     }
 
     /**
