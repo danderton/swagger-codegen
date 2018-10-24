@@ -541,7 +541,7 @@ class ApiClient(object):
         try:
             return klass(data)
         except UnicodeEncodeError:
-            return six.u(data)
+            return six.text_type(data)
         except TypeError:
             return data
 
@@ -614,6 +614,12 @@ class ApiClient(object):
 
         instance = klass(**kwargs)
 
+        if (isinstance(instance, dict) and
+                klass.swagger_types is not None and
+                isinstance(data, dict)):
+            for key, value in data.items():
+                if key not in klass.swagger_types:
+                    instance[key] = value
         if hasattr(instance, 'get_real_child_model'):
             klass_name = instance.get_real_child_model(data)
             if klass_name:

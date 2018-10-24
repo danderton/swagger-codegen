@@ -15,16 +15,6 @@ class ApiClient {
   Map<String, String> _defaultHeaderMap = {};
   Map<String, Authentication> _authentications = {};
 
-  final dson = new Dartson.JSON()
-  {{#models}}
-    {{#model}}
-      {{#isEnum}}
-      ..addTransformer(new {{classname}}TypeTransformer(), {{classname}})
-      {{/isEnum}}
-    {{/model}}
-  {{/models}}
-      ..addTransformer(new DateTimeParser(), DateTime);
-
   final _RegList = new RegExp(r'^List<(.*)>$');
   final _RegMap = new RegExp(r'^Map<String,(.*)>$');
 
@@ -54,14 +44,10 @@ class ApiClient {
           {{#model}}
         case '{{classname}}':
             {{#isEnum}}
-          // Enclose the value in a list so that Dartson can use a transformer
-          // to decode it.
-          final listValue = [value];
-          final List<dynamic> listResult = dson.map(listValue, []);
-          return listResult[0];
+           return new {{classname}}.fromJson(value);
             {{/isEnum}}
             {{^isEnum}}
-          return dson.map(value, new {{classname}}());
+          return new {{classname}}.fromJson(value);
             {{/isEnum}}
           {{/model}}
         {{/models}}
@@ -86,13 +72,13 @@ class ApiClient {
     throw new ApiException(500, 'Could not find a suitable class for deserialization');
   }
 
-  dynamic deserialize(String json, String targetType) {
+  dynamic deserialize(String jsonVal, String targetType) {
     // Remove all spaces.  Necessary for reg expressions as well.
     targetType = targetType.replaceAll(' ', '');
 
-    if (targetType == 'String') return json;
+    if (targetType == 'String') return jsonVal;
 
-    var decodedJson = JSON.decode(json);
+    var decodedJson = json.decode(jsonVal);
     return _deserialize(decodedJson, targetType);
   }
 
@@ -100,10 +86,8 @@ class ApiClient {
     String serialized = '';
     if (obj == null) {
       serialized = '';
-    } else if (obj is String) {
-      serialized = obj;
     } else {
-      serialized = dson.encode(obj);
+      serialized = json.encode(obj);
     }
     return serialized;
   }
@@ -163,6 +147,14 @@ class ApiClient {
       Authentication auth = _authentications[authName];
       if (auth == null) throw new ArgumentError("Authentication undefined: " + authName);
       auth.applyToParams(queryParams, headerParams);
+    });
+  }
+
+  void setAccessToken(String accessToken) {
+    _authentications.forEach((key, auth) {
+      if (auth is OAuth) {
+        auth.setAccessToken(accessToken);
+      }
     });
   }
 }

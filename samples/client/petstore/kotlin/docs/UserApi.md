@@ -1,6 +1,6 @@
 # UserApi
 
-All URIs are relative to *http://petstore.swagger.io/v2*
+All URIs are relative to *https://petstore.swagger.io/v2*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
@@ -351,7 +351,7 @@ This can only be done by the logged in user.
 //import io.swagger.client.models.*
 
 val apiInstance = UserApi()
-val username : kotlin.String = username_example // kotlin.String | name that need to be deleted
+val username : kotlin.String = username_example // kotlin.String | name that need to be updated
 val body : User =  // User | Updated user object
 try {
     apiInstance.updateUser(username, body)
@@ -368,7 +368,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **username** | **kotlin.String**| name that need to be deleted |
+ **username** | **kotlin.String**| name that need to be updated |
  **body** | [**User**](User.md)| Updated user object |
 
 ### Return type

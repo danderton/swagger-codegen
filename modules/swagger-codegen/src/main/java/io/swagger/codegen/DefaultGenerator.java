@@ -114,6 +114,7 @@ public class DefaultGenerator extends AbstractGenerator implements Generator {
             hostBuilder.append(swagger.getHost());
         } else {
             hostBuilder.append("localhost");
+            LOGGER.warn("'host' not defined in the spec. Default to 'localhost'.");
         }
         if (!StringUtils.isEmpty(swagger.getBasePath()) && !swagger.getBasePath().equals("/")) {
             hostBuilder.append(swagger.getBasePath());
@@ -156,6 +157,9 @@ public class DefaultGenerator extends AbstractGenerator implements Generator {
 
         config.additionalProperties().put(CodegenConstants.GENERATE_API_DOCS, generateApiDocumentation);
         config.additionalProperties().put(CodegenConstants.GENERATE_MODEL_DOCS, generateModelDocumentation);
+
+        config.additionalProperties().put(CodegenConstants.GENERATE_APIS, generateApis);
+        config.additionalProperties().put(CodegenConstants.GENERATE_MODELS, generateModels);
 
         if (!generateApiTests && !generateModelTests) {
             config.additionalProperties().put(CodegenConstants.EXCLUDE_TESTS, true);
@@ -363,11 +367,15 @@ public class DefaultGenerator extends AbstractGenerator implements Generator {
                 Map<String, Model> modelMap = new HashMap<String, Model>();
                 modelMap.put(name, model);
                 Map<String, Object> models = processModels(config, modelMap, definitions);
-                models.put("classname", config.toModelName(name));
-                models.putAll(config.additionalProperties());
-                allProcessedModels.put(name, models);
+                if (models != null) {
+                    models.put("classname", config.toModelName(name));
+                    models.putAll(config.additionalProperties());
+                    allProcessedModels.put(name, models);
+                }
             } catch (Exception e) {
-                throw new RuntimeException("Could not process model '" + name + "'" + ".Please make sure that your schema is correct!", e);
+                String message = "Could not process model '" + name + "'" + ". Please make sure that your schema is correct!";
+                LOGGER.error(message, e);
+                throw new RuntimeException(message, e);
             }
         }
 
@@ -551,7 +559,7 @@ public class DefaultGenerator extends AbstractGenerator implements Generator {
             return;
         }
         Set<String> supportingFilesToGenerate = null;
-        String supportingFiles = System.getProperty("supportingFiles");
+        String supportingFiles = System.getProperty(CodegenConstants.SUPPORTING_FILES);
         if (supportingFiles != null && !supportingFiles.isEmpty()) {
             supportingFilesToGenerate = new HashSet<String>(Arrays.asList(supportingFiles.split(",")));
         }
@@ -977,7 +985,9 @@ public class DefaultGenerator extends AbstractGenerator implements Generator {
             }
             if (mapping != null) {
                 im.put("import", mapping);
-                imports.add(im);
+                if (!imports.contains(im)) { // avoid duplicates
+                    imports.add(im);
+                }
             }
         }
 
@@ -1008,6 +1018,16 @@ public class DefaultGenerator extends AbstractGenerator implements Generator {
         Set<String> allImports = new LinkedHashSet<String>();
         for (String key : definitions.keySet()) {
             Model mm = definitions.get(key);
+            if(mm.getVendorExtensions() !=  null && mm.getVendorExtensions().containsKey("x-codegen-ignore")) {
+                // skip this model
+                LOGGER.debug("skipping model " + key);
+                return null;
+            }
+            else if(mm.getVendorExtensions() !=  null && mm.getVendorExtensions().containsKey("x-codegen-import-mapping")) {
+                String codegenImport = mm.getVendorExtensions().get("x-codegen-import-mapping").toString();
+                config.importMapping().put(key, codegenImport);
+                allImports.add(codegenImport);
+            }
             CodegenModel cm = config.fromModel(key, mm, allDefinitions);
             Map<String, Object> mo = new HashMap<String, Object>();
             mo.put("model", cm);
