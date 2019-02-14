@@ -56,7 +56,7 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
     public static final String SUPPORT_JAVA6 = "supportJava6";
     public static final String DISABLE_HTML_ESCAPING = "disableHtmlEscaping";
 
-    protected String dateLibrary = "threetenbp";
+    protected String dateLibrary = "joda";
     protected boolean supportAsync = false;
     protected boolean java8Mode = false;
     protected boolean withXml = false;
@@ -87,7 +87,7 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
     protected String apiDocPath = "docs/";
     protected String modelDocPath = "docs/";
     protected boolean supportJava6= false;
-    protected boolean disableHtmlEscaping = false;
+    protected boolean disableHtmlEscaping = true;
 
     public AbstractJavaCodegen() {
         super();
