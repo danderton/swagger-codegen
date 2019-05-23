@@ -8,12 +8,15 @@ import retrofit2.Call;
 import retrofit2.http.*;
 
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import okhttp3.MultipartBody;
 
 import java.math.BigDecimal;
 import io.swagger.client.model.Client;
 import org.threeten.bp.LocalDate;
 import org.threeten.bp.OffsetDateTime;
 import io.swagger.client.model.OuterComposite;
+import io.swagger.client.model.User;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -66,6 +69,21 @@ public interface FakeApi {
   @POST("fake/outer/string")
   CompletionStage<Response<String>> fakeOuterStringSerialize(
     @retrofit2.http.Body String body
+  );
+
+  /**
+   * 
+   * 
+   * @param body  (required)
+   * @param query  (required)
+   * @return Call&lt;Void&gt;
+   */
+  @Headers({
+    "Content-Type:application/json"
+  })
+  @PUT("fake/body-with-query-params")
+  CompletionStage<Response<Void>> testBodyWithQueryParams(
+    @retrofit2.http.Body User body, @retrofit2.http.Query("query") String query
   );
 
   /**
@@ -124,6 +142,20 @@ public interface FakeApi {
   @GET("fake")
   CompletionStage<Response<Void>> testEnumParameters(
     @retrofit2.http.Field("enum_form_string_array") List<String> enumFormStringArray, @retrofit2.http.Field("enum_form_string") String enumFormString, @retrofit2.http.Header("enum_header_string_array") List<String> enumHeaderStringArray, @retrofit2.http.Header("enum_header_string") String enumHeaderString, @retrofit2.http.Query("enum_query_string_array") CSVParams enumQueryStringArray, @retrofit2.http.Query("enum_query_string") String enumQueryString, @retrofit2.http.Query("enum_query_integer") Integer enumQueryInteger, @retrofit2.http.Field("enum_query_double") Double enumQueryDouble
+  );
+
+  /**
+   * test inline additionalProperties
+   * 
+   * @param param request body (required)
+   * @return Call&lt;Void&gt;
+   */
+  @Headers({
+    "Content-Type:application/json"
+  })
+  @POST("fake/inline-additionalProperties")
+  CompletionStage<Response<Void>> testInlineAdditionalProperties(
+    @retrofit2.http.Body Object param
   );
 
   /**

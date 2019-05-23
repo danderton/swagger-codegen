@@ -5,6 +5,7 @@ import io.swagger.model.Client;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import io.swagger.model.OuterComposite;
+import io.swagger.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.*;
 import org.slf4j.Logger;
@@ -42,7 +43,7 @@ public interface FakeApiDelegate {
     /**
      * @see FakeApi#fakeOuterBooleanSerialize
      */
-    default ResponseEntity<Boolean> fakeOuterBooleanSerialize(Boolean body) {
+    default ResponseEntity<Boolean> fakeOuterBooleanSerialize( Boolean  body) {
         if(getObjectMapper().isPresent() && getAcceptHeader().isPresent()) {
             if (getAcceptHeader().get().contains("application/json")) {
                 try {
@@ -61,7 +62,7 @@ public interface FakeApiDelegate {
     /**
      * @see FakeApi#fakeOuterCompositeSerialize
      */
-    default ResponseEntity<OuterComposite> fakeOuterCompositeSerialize(OuterComposite body) {
+    default ResponseEntity<OuterComposite> fakeOuterCompositeSerialize( OuterComposite  body) {
         if(getObjectMapper().isPresent() && getAcceptHeader().isPresent()) {
             if (getAcceptHeader().get().contains("application/json")) {
                 try {
@@ -80,7 +81,7 @@ public interface FakeApiDelegate {
     /**
      * @see FakeApi#fakeOuterNumberSerialize
      */
-    default ResponseEntity<BigDecimal> fakeOuterNumberSerialize(BigDecimal body) {
+    default ResponseEntity<BigDecimal> fakeOuterNumberSerialize( BigDecimal  body) {
         if(getObjectMapper().isPresent() && getAcceptHeader().isPresent()) {
             if (getAcceptHeader().get().contains("application/json")) {
                 try {
@@ -99,7 +100,7 @@ public interface FakeApiDelegate {
     /**
      * @see FakeApi#fakeOuterStringSerialize
      */
-    default ResponseEntity<String> fakeOuterStringSerialize(String body) {
+    default ResponseEntity<String> fakeOuterStringSerialize( String  body) {
         if(getObjectMapper().isPresent() && getAcceptHeader().isPresent()) {
             if (getAcceptHeader().get().contains("application/json")) {
                 try {
@@ -116,9 +117,21 @@ public interface FakeApiDelegate {
     }
 
     /**
+     * @see FakeApi#testBodyWithQueryParams
+     */
+    default ResponseEntity<Void> testBodyWithQueryParams( User  body,
+         String  query) {
+        if(getObjectMapper().isPresent() && getAcceptHeader().isPresent()) {
+        } else {
+            log.warn("ObjectMapper or HttpServletRequest not configured in default FakeApi interface so no example is generated");
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    }
+
+    /**
      * @see FakeApi#testClientModel
      */
-    default ResponseEntity<Client> testClientModel(Client body) {
+    default ResponseEntity<Client> testClientModel( Client  body) {
         if(getObjectMapper().isPresent() && getAcceptHeader().isPresent()) {
             if (getAcceptHeader().get().contains("application/json")) {
                 try {
@@ -137,20 +150,20 @@ public interface FakeApiDelegate {
     /**
      * @see FakeApi#testEndpointParameters
      */
-    default ResponseEntity<Void> testEndpointParameters(BigDecimal number,
-        Double _double,
-        String patternWithoutDelimiter,
-        byte[] _byte,
-        Integer integer,
-        Integer int32,
-        Long int64,
-        Float _float,
-        String string,
-        byte[] binary,
-        LocalDate date,
-        OffsetDateTime dateTime,
-        String password,
-        String paramCallback) {
+    default ResponseEntity<Void> testEndpointParameters( BigDecimal  number,
+         Double  _double,
+         String  patternWithoutDelimiter,
+         byte[]  _byte,
+         Integer  integer,
+         Integer  int32,
+         Long  int64,
+         Float  _float,
+         String  string,
+         byte[]  binary,
+         LocalDate  date,
+         OffsetDateTime  dateTime,
+         String  password,
+         String  paramCallback) {
         if(getObjectMapper().isPresent() && getAcceptHeader().isPresent()) {
         } else {
             log.warn("ObjectMapper or HttpServletRequest not configured in default FakeApi interface so no example is generated");
@@ -161,14 +174,14 @@ public interface FakeApiDelegate {
     /**
      * @see FakeApi#testEnumParameters
      */
-    default ResponseEntity<Void> testEnumParameters(List<String> enumFormStringArray,
-        String enumFormString,
-        List<String> enumHeaderStringArray,
-        String enumHeaderString,
-        List<String> enumQueryStringArray,
-        String enumQueryString,
-        Integer enumQueryInteger,
-        Double enumQueryDouble) {
+    default ResponseEntity<Void> testEnumParameters( List<String>  enumFormStringArray,
+         String  enumFormString,
+         List<String>  enumHeaderStringArray,
+         String  enumHeaderString,
+         List<String>  enumQueryStringArray,
+         String  enumQueryString,
+         Integer  enumQueryInteger,
+         Double  enumQueryDouble) {
         if(getObjectMapper().isPresent() && getAcceptHeader().isPresent()) {
         } else {
             log.warn("ObjectMapper or HttpServletRequest not configured in default FakeApi interface so no example is generated");
@@ -179,7 +192,7 @@ public interface FakeApiDelegate {
     /**
      * @see FakeApi#testInlineAdditionalProperties
      */
-    default ResponseEntity<Void> testInlineAdditionalProperties(Object param) {
+    default ResponseEntity<Void> testInlineAdditionalProperties( Object  param) {
         if(getObjectMapper().isPresent() && getAcceptHeader().isPresent()) {
         } else {
             log.warn("ObjectMapper or HttpServletRequest not configured in default FakeApi interface so no example is generated");
@@ -190,8 +203,8 @@ public interface FakeApiDelegate {
     /**
      * @see FakeApi#testJsonFormData
      */
-    default ResponseEntity<Void> testJsonFormData(String param,
-        String param2) {
+    default ResponseEntity<Void> testJsonFormData( String  param,
+         String  param2) {
         if(getObjectMapper().isPresent() && getAcceptHeader().isPresent()) {
         } else {
             log.warn("ObjectMapper or HttpServletRequest not configured in default FakeApi interface so no example is generated");

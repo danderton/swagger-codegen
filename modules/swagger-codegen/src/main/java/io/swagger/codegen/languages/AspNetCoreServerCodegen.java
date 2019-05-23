@@ -35,7 +35,8 @@ public class AspNetCoreServerCodegen extends AbstractCSharpCodegen {
         apiTemplateFiles.put("controller.mustache", ".cs");
 
         // contextually reserved words
-        setReservedWordsLowerCase(
+        // NOTE: C# uses camel cased reserved words, while models are title cased. We don't want lowercase comparisons.
+        reservedWords.addAll(
             Arrays.asList("var", "async", "await", "dynamic", "yield")
         );
 
@@ -57,6 +58,10 @@ public class AspNetCoreServerCodegen extends AbstractCSharpCodegen {
         addOption(CodegenConstants.SOURCE_FOLDER,
                 CodegenConstants.SOURCE_FOLDER_DESC,
                 sourceFolder);
+
+        addOption(CodegenConstants.PRESERVE_COMMENT_NEWLINES,
+                "Preserve newlines in comments",
+                String.valueOf(this.preserveNewLines));
 
         // CLI Switches
         addSwitch(CodegenConstants.SORT_PARAMS_BY_REQUIRED_FLAG,

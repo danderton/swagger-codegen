@@ -4,6 +4,8 @@ import com.google.common.collect.ImmutableMap;
 import com.samskivert.mustache.Mustache;
 import io.swagger.codegen.*;
 import io.swagger.models.Model;
+import io.swagger.models.properties.ArrayProperty;
+import io.swagger.models.properties.Property;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +44,6 @@ public class CSharpClientCodegen extends AbstractCSharpCodegen {
     protected boolean supportsUWP = Boolean.FALSE;
     protected boolean netStandard = Boolean.FALSE;
     protected boolean generatePropertyChanged = Boolean.FALSE;
-    protected boolean hideGenerationTimestamp = Boolean.TRUE;
 
     protected boolean validatable = Boolean.TRUE;
     protected Map<Character, String> regexModifiers;
@@ -59,6 +60,8 @@ public class CSharpClientCodegen extends AbstractCSharpCodegen {
 
         modelDocTemplateFiles.put("model_doc.mustache", ".md");
         apiDocTemplateFiles.put("api_doc.mustache", ".md");
+
+        hideGenerationTimestamp = Boolean.TRUE;
 
         cliOptions.clear();
 
@@ -186,12 +189,6 @@ public class CSharpClientCodegen extends AbstractCSharpCodegen {
             setModelPropertyNaming((String) additionalProperties.get(CodegenConstants.MODEL_PROPERTY_NAMING));
         }
 
-        // default HIDE_GENERATION_TIMESTAMP to true
-        if (additionalProperties.containsKey(CodegenConstants.HIDE_GENERATION_TIMESTAMP)) {
-            setHideGenerationTimestamp(convertPropertyToBooleanAndWriteBack(CodegenConstants.HIDE_GENERATION_TIMESTAMP));
-        } else {
-            additionalProperties.put(CodegenConstants.HIDE_GENERATION_TIMESTAMP, hideGenerationTimestamp);
-        }
 
         if (isEmpty(apiPackage)) {
             setApiPackage("Api");
@@ -672,19 +669,6 @@ public class CSharpClientCodegen extends AbstractCSharpCodegen {
     }
 
     @Override
-    public String toEnumValue(String value, String datatype) {
-        if ("int?".equalsIgnoreCase(datatype) || "long?".equalsIgnoreCase(datatype) ||
-                "double?".equalsIgnoreCase(datatype) || "float?".equalsIgnoreCase(datatype)) {
-            return value;
-        } else if ("float?".equalsIgnoreCase(datatype)) {
-            // for float in C#, append "f". e.g. 3.14 => 3.14f
-            return value + "f";
-        } else {
-            return "\"" + escapeText(value) + "\"";
-        }
-    }
-
-    @Override
     public String toEnumVarName(String value, String datatype) {
         if (value.length() == 0) {
             return "Empty";
@@ -696,8 +680,8 @@ public class CSharpClientCodegen extends AbstractCSharpCodegen {
         }
 
         // number
-        if ("int?".equals(datatype) || "long?".equals(datatype) ||
-                "double?".equals(datatype) || "float?".equals(datatype)) {
+        if(datatype.startsWith("int") || datatype.startsWith("long") ||
+                datatype.startsWith("double") || datatype.startsWith("float")) {
             String varName = "NUMBER_" + value;
             varName = varName.replaceAll("-", "MINUS_");
             varName = varName.replaceAll("\\+", "PLUS_");
@@ -777,10 +761,6 @@ public class CSharpClientCodegen extends AbstractCSharpCodegen {
 
     public void setGeneratePropertyChanged(final Boolean generatePropertyChanged) {
         this.generatePropertyChanged = generatePropertyChanged;
-    }
-
-    public void setHideGenerationTimestamp(boolean hideGenerationTimestamp) {
-        this.hideGenerationTimestamp = hideGenerationTimestamp;
     }
 
     public boolean isNonPublicApi() {

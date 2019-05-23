@@ -37,8 +37,10 @@ import Data.Aeson ((.:),(.:!),(.:?),(.=))
 import qualified Control.Arrow as P (left)
 import qualified Data.Aeson as A
 import qualified Data.ByteString as B
+import qualified Data.ByteString.Base64 as B64
+import qualified Data.ByteString.Char8 as BC
 import qualified Data.ByteString.Lazy as BL
-import qualified Data.Data as P (Data, Typeable)
+import qualified Data.Data as P (Typeable, TypeRep, typeOf, typeRep)
 import qualified Data.Foldable as P
 import qualified Data.HashMap.Lazy as HM
 import qualified Data.Map as Map
@@ -47,17 +49,134 @@ import qualified Data.Set as Set
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
 import qualified Data.Time as TI
+import qualified Lens.Micro as L
 import qualified Web.FormUrlEncoded as WH
 import qualified Web.HttpApiData as WH
 
 import Control.Applicative ((<|>))
 import Control.Applicative (Alternative)
+import Data.Function ((&))
+import Data.Monoid ((<>))
 import Data.Text (Text)
-import Prelude (($), (.),(<$>),(<*>),(>>=),(=<<),Maybe(..),Bool(..),Char,Double,FilePath,Float,Int,Integer,String,fmap,undefined,mempty,maybe,pure,Monad,Applicative,Functor)
+import Prelude (($),(/=),(.),(<$>),(<*>),(>>=),(=<<),Maybe(..),Bool(..),Char,Double,FilePath,Float,Int,Integer,String,fmap,undefined,mempty,maybe,pure,Monad,Applicative,Functor)
 
 import qualified Prelude as P
 
 
+
+-- * Parameter newtypes
+
+
+-- ** AdditionalMetadata
+newtype AdditionalMetadata = AdditionalMetadata { unAdditionalMetadata :: Text } deriving (P.Eq, P.Show)
+
+-- ** ApiKey
+newtype ApiKey = ApiKey { unApiKey :: Text } deriving (P.Eq, P.Show)
+
+-- ** Body
+newtype Body = Body { unBody :: [User] } deriving (P.Eq, P.Show, A.ToJSON)
+
+-- ** Byte
+newtype Byte = Byte { unByte :: ByteArray } deriving (P.Eq, P.Show)
+
+-- ** Callback
+newtype Callback = Callback { unCallback :: Text } deriving (P.Eq, P.Show)
+
+-- ** EnumFormString
+newtype EnumFormString = EnumFormString { unEnumFormString :: E'EnumFormString } deriving (P.Eq, P.Show)
+
+-- ** EnumFormStringArray
+newtype EnumFormStringArray = EnumFormStringArray { unEnumFormStringArray :: [E'Inner2] } deriving (P.Eq, P.Show)
+
+-- ** EnumHeaderString
+newtype EnumHeaderString = EnumHeaderString { unEnumHeaderString :: E'EnumFormString } deriving (P.Eq, P.Show)
+
+-- ** EnumHeaderStringArray
+newtype EnumHeaderStringArray = EnumHeaderStringArray { unEnumHeaderStringArray :: [E'Inner2] } deriving (P.Eq, P.Show)
+
+-- ** EnumQueryDouble
+newtype EnumQueryDouble = EnumQueryDouble { unEnumQueryDouble :: E'EnumNumber } deriving (P.Eq, P.Show)
+
+-- ** EnumQueryInteger
+newtype EnumQueryInteger = EnumQueryInteger { unEnumQueryInteger :: E'EnumQueryInteger } deriving (P.Eq, P.Show)
+
+-- ** EnumQueryString
+newtype EnumQueryString = EnumQueryString { unEnumQueryString :: E'EnumFormString } deriving (P.Eq, P.Show)
+
+-- ** EnumQueryStringArray
+newtype EnumQueryStringArray = EnumQueryStringArray { unEnumQueryStringArray :: [E'Inner2] } deriving (P.Eq, P.Show)
+
+-- ** File
+newtype File = File { unFile :: FilePath } deriving (P.Eq, P.Show)
+
+-- ** Int32
+newtype Int32 = Int32 { unInt32 :: Int } deriving (P.Eq, P.Show)
+
+-- ** Int64
+newtype Int64 = Int64 { unInt64 :: Integer } deriving (P.Eq, P.Show)
+
+-- ** Name2
+newtype Name2 = Name2 { unName2 :: Text } deriving (P.Eq, P.Show)
+
+-- ** Number
+newtype Number = Number { unNumber :: Double } deriving (P.Eq, P.Show)
+
+-- ** OrderId
+newtype OrderId = OrderId { unOrderId :: Integer } deriving (P.Eq, P.Show)
+
+-- ** OrderIdText
+newtype OrderIdText = OrderIdText { unOrderIdText :: Text } deriving (P.Eq, P.Show)
+
+-- ** Param
+newtype Param = Param { unParam :: Text } deriving (P.Eq, P.Show)
+
+-- ** Param2
+newtype Param2 = Param2 { unParam2 :: Text } deriving (P.Eq, P.Show)
+
+-- ** ParamBinary
+newtype ParamBinary = ParamBinary { unParamBinary :: Binary } deriving (P.Eq, P.Show)
+
+-- ** ParamDate
+newtype ParamDate = ParamDate { unParamDate :: Date } deriving (P.Eq, P.Show)
+
+-- ** ParamDateTime
+newtype ParamDateTime = ParamDateTime { unParamDateTime :: DateTime } deriving (P.Eq, P.Show)
+
+-- ** ParamDouble
+newtype ParamDouble = ParamDouble { unParamDouble :: Double } deriving (P.Eq, P.Show)
+
+-- ** ParamFloat
+newtype ParamFloat = ParamFloat { unParamFloat :: Float } deriving (P.Eq, P.Show)
+
+-- ** ParamInteger
+newtype ParamInteger = ParamInteger { unParamInteger :: Int } deriving (P.Eq, P.Show)
+
+-- ** ParamString
+newtype ParamString = ParamString { unParamString :: Text } deriving (P.Eq, P.Show)
+
+-- ** Password
+newtype Password = Password { unPassword :: Text } deriving (P.Eq, P.Show)
+
+-- ** PatternWithoutDelimiter
+newtype PatternWithoutDelimiter = PatternWithoutDelimiter { unPatternWithoutDelimiter :: Text } deriving (P.Eq, P.Show)
+
+-- ** PetId
+newtype PetId = PetId { unPetId :: Integer } deriving (P.Eq, P.Show)
+
+-- ** Query
+newtype Query = Query { unQuery :: Text } deriving (P.Eq, P.Show)
+
+-- ** Status
+newtype Status = Status { unStatus :: [E'Status2] } deriving (P.Eq, P.Show)
+
+-- ** StatusText
+newtype StatusText = StatusText { unStatusText :: Text } deriving (P.Eq, P.Show)
+
+-- ** Tags
+newtype Tags = Tags { unTags :: [Text] } deriving (P.Eq, P.Show)
+
+-- ** Username
+newtype Username = Username { unUsername :: Text } deriving (P.Eq, P.Show)
 
 -- * Models
 
@@ -456,6 +575,7 @@ mkEnumArrays =
 -- | EnumTest
 data EnumTest = EnumTest
   { enumTestEnumString :: !(Maybe E'EnumString) -- ^ "enum_string"
+  , enumTestEnumStringRequired :: !(E'EnumString) -- ^ /Required/ "enum_string_required"
   , enumTestEnumInteger :: !(Maybe E'EnumInteger) -- ^ "enum_integer"
   , enumTestEnumNumber :: !(Maybe E'EnumNumber) -- ^ "enum_number"
   , enumTestOuterEnum :: !(Maybe OuterEnum) -- ^ "outerEnum"
@@ -466,6 +586,7 @@ instance A.FromJSON EnumTest where
   parseJSON = A.withObject "EnumTest" $ \o ->
     EnumTest
       <$> (o .:? "enum_string")
+      <*> (o .:  "enum_string_required")
       <*> (o .:? "enum_integer")
       <*> (o .:? "enum_number")
       <*> (o .:? "outerEnum")
@@ -475,6 +596,7 @@ instance A.ToJSON EnumTest where
   toJSON EnumTest {..} =
    _omitNulls
       [ "enum_string" .= enumTestEnumString
+      , "enum_string_required" .= enumTestEnumStringRequired
       , "enum_integer" .= enumTestEnumInteger
       , "enum_number" .= enumTestEnumNumber
       , "outerEnum" .= enumTestOuterEnum
@@ -483,10 +605,12 @@ instance A.ToJSON EnumTest where
 
 -- | Construct a value of type 'EnumTest' (by applying it's required fields, if any)
 mkEnumTest
-  :: EnumTest
-mkEnumTest =
+  :: E'EnumString -- ^ 'enumTestEnumStringRequired' 
+  -> EnumTest
+mkEnumTest enumTestEnumStringRequired =
   EnumTest
   { enumTestEnumString = Nothing
+  , enumTestEnumStringRequired
   , enumTestEnumInteger = Nothing
   , enumTestEnumNumber = Nothing
   , enumTestOuterEnum = Nothing
@@ -1595,3 +1719,60 @@ toOuterEnum = \case
   "approved" -> P.Right OuterEnum'Approved
   "delivered" -> P.Right OuterEnum'Delivered
   s -> P.Left $ "toOuterEnum: enum parse failure: " P.++ P.show s
+
+
+-- * Auth Methods
+
+-- ** AuthApiKeyApiKey
+data AuthApiKeyApiKey =
+  AuthApiKeyApiKey Text -- ^ secret
+  deriving (P.Eq, P.Show, P.Typeable)
+
+instance AuthMethod AuthApiKeyApiKey where
+  applyAuthMethod _ a@(AuthApiKeyApiKey secret) req =
+    P.pure $
+    if (P.typeOf a `P.elem` rAuthTypes req)
+      then req `setHeader` toHeader ("api_key", secret)
+           & L.over rAuthTypesL (P.filter (/= P.typeOf a))
+      else req
+
+-- ** AuthApiKeyApiKeyQuery
+data AuthApiKeyApiKeyQuery =
+  AuthApiKeyApiKeyQuery Text -- ^ secret
+  deriving (P.Eq, P.Show, P.Typeable)
+
+instance AuthMethod AuthApiKeyApiKeyQuery where
+  applyAuthMethod _ a@(AuthApiKeyApiKeyQuery secret) req =
+    P.pure $
+    if (P.typeOf a `P.elem` rAuthTypes req)
+      then req `setQuery` toQuery ("api_key_query", Just secret)
+           & L.over rAuthTypesL (P.filter (/= P.typeOf a))
+      else req
+
+-- ** AuthBasicHttpBasicTest
+data AuthBasicHttpBasicTest =
+  AuthBasicHttpBasicTest B.ByteString B.ByteString -- ^ username password
+  deriving (P.Eq, P.Show, P.Typeable)
+
+instance AuthMethod AuthBasicHttpBasicTest where
+  applyAuthMethod _ a@(AuthBasicHttpBasicTest user pw) req =
+    P.pure $
+    if (P.typeOf a `P.elem` rAuthTypes req)
+      then req `setHeader` toHeader ("Authorization", T.decodeUtf8 cred)
+           & L.over rAuthTypesL (P.filter (/= P.typeOf a))
+      else req
+    where cred = BC.append "Basic " (B64.encode $ BC.concat [ user, ":", pw ])
+
+-- ** AuthOAuthPetstoreAuth
+data AuthOAuthPetstoreAuth =
+  AuthOAuthPetstoreAuth Text -- ^ secret
+  deriving (P.Eq, P.Show, P.Typeable)
+
+instance AuthMethod AuthOAuthPetstoreAuth where
+  applyAuthMethod _ a@(AuthOAuthPetstoreAuth secret) req =
+    P.pure $
+    if (P.typeOf a `P.elem` rAuthTypes req)
+      then req `setHeader` toHeader ("Authorization", "Bearer " <> secret) 
+           & L.over rAuthTypesL (P.filter (/= P.typeOf a))
+      else req
+

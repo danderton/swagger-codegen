@@ -5,6 +5,7 @@ import apimodels.Client;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import apimodels.OuterComposite;
+import apimodels.User;
 
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -111,6 +112,29 @@ public class FakeApiController extends Controller {
         String obj = imp.fakeOuterStringSerialize(body);
         JsonNode result = mapper.valueToTree(obj);
         return ok(result);
+    }
+
+    @ApiAction
+    public Result testBodyWithQueryParams() throws Exception {
+        JsonNode nodebody = request().body().asJson();
+        User body;
+        if (nodebody != null) {
+            body = mapper.readValue(nodebody.toString(), User.class);
+            if (configuration.getBoolean("useInputBeanValidation")) {
+                SwaggerUtils.validate(body);
+            }
+        } else {
+            throw new IllegalArgumentException("'body' parameter is required");
+        }
+        String valuequery = request().getQueryString("query");
+        String query;
+        if (valuequery != null) {
+            query = valuequery;
+        } else {
+            throw new IllegalArgumentException("'query' parameter is required");
+        }
+        imp.testBodyWithQueryParams(body, query);
+        return ok();
     }
 
     @ApiAction
@@ -243,8 +267,10 @@ public class FakeApiController extends Controller {
         List<String> enumQueryStringArrayList = SwaggerUtils.parametersToList("csv", enumQueryStringArrayArray);
         List<String> enumQueryStringArray = new ArrayList<String>();
         for (String curParam : enumQueryStringArrayList) {
-            //noinspection UseBulkOperation
-            enumQueryStringArray.add(curParam);
+            if (!curParam.isEmpty()) {
+                //noinspection UseBulkOperation
+                enumQueryStringArray.add(curParam);
+            }
         }
         String valueenumQueryString = request().getQueryString("enum_query_string");
         String enumQueryString;
@@ -264,8 +290,10 @@ public class FakeApiController extends Controller {
         List<String> enumFormStringArrayList = SwaggerUtils.parametersToList("csv", enumFormStringArrayArray);
         List<String> enumFormStringArray = new ArrayList<String>();
         for (String curParam : enumFormStringArrayList) {
-            //noinspection UseBulkOperation
-            enumFormStringArray.add(curParam);
+            if (!curParam.isEmpty()) {
+                //noinspection UseBulkOperation
+                enumFormStringArray.add(curParam);
+            }
         }
         String valueenumFormString = (request().body().asMultipartFormData().asFormUrlEncoded().get("enum_form_string"))[0];
         String enumFormString;
@@ -285,8 +313,10 @@ public class FakeApiController extends Controller {
         List<String> enumHeaderStringArrayList = SwaggerUtils.parametersToList("csv", enumHeaderStringArrayArray);
         List<String> enumHeaderStringArray = new ArrayList<String>();
         for (String curParam : enumHeaderStringArrayList) {
-            //noinspection UseBulkOperation
-            enumHeaderStringArray.add(curParam);
+            if (!curParam.isEmpty()) {
+                //noinspection UseBulkOperation
+                enumHeaderStringArray.add(curParam);
+            }
         }
         String valueenumHeaderString = request().getHeader("enum_header_string");
         String enumHeaderString;

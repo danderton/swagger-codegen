@@ -16,7 +16,6 @@ import { Api } from './Api';
 import { AuthStorage } from './AuthStorage';
 import {
   User,
-  Array&lt;User&gt;,
 } from './models';
 
 /**
@@ -86,6 +85,7 @@ export class UserApi extends Api {
    * Creates a new UserApi class.
    *
    * @param httpClient The Aurelia HTTP client to be injected.
+   * @param authStorage A storage for authentication data.
    */
   constructor(httpClient: HttpClient, authStorage: AuthStorage) {
     super(httpClient, authStorage);
@@ -192,7 +192,7 @@ export class UserApi extends Api {
 
     // Create URL to call
     const url = `${this.basePath}/user/{username}`
-      .replace(`{${'username'}}`, encodeURIComponent(String(${params['username']})));
+      .replace(`{${'username'}}`, encodeURIComponent(`${params['username']}`));
 
     const response = await this.httpClient.createRequest(url)
       // Set HTTP method
@@ -212,7 +212,7 @@ export class UserApi extends Api {
   /**
    * Get user by user name
    * 
-   * @param params.username The name that needs to be fetched. Use user1 for testing. 
+   * @param params.username The name that needs to be fetched. Use user1 for testing.
    */
   async getUserByName(params: IGetUserByNameParams): Promise<User> {
     // Verify required parameters are set
@@ -220,7 +220,7 @@ export class UserApi extends Api {
 
     // Create URL to call
     const url = `${this.basePath}/user/{username}`
-      .replace(`{${'username'}}`, encodeURIComponent(String(${params['username']})));
+      .replace(`{${'username'}}`, encodeURIComponent(`${params['username']}`));
 
     const response = await this.httpClient.createRequest(url)
       // Set HTTP method
@@ -309,7 +309,7 @@ export class UserApi extends Api {
 
     // Create URL to call
     const url = `${this.basePath}/user/{username}`
-      .replace(`{${'username'}}`, encodeURIComponent(String(${params['username']})));
+      .replace(`{${'username'}}`, encodeURIComponent(`${params['username']}`));
 
     const response = await this.httpClient.createRequest(url)
       // Set HTTP method
